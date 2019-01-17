@@ -37,6 +37,23 @@
         "DP"       
       ],
       "Enabled": true
+    },
+    {
+      "ControlID": "AzureDevOps_Release_SI_Review_InActive_Release",
+      "Description": " Inactive release must be removed",
+      "Id": "Release130",
+      "ControlSeverity": "Low",
+      "Automated": "Yes",
+      "MethodName": "CheckInActiveRelease",
+      "Rationale": "Each additional release having access at repositories increases the attack surface. To minimize this risk ensure that only activite and legitimate release resources present in Organization",
+      "Recommendation": "https://docs.microsoft.com/en-us/rest/api/azure/devops/release/definitions/delete?view=azure-devops-rest-5.0",
+      "Tags": [
+        "SDL",
+        "Best Practice",
+        "Manual",
+        "SI"
+      ],
+      "Enabled": true
     }
     ]
 }

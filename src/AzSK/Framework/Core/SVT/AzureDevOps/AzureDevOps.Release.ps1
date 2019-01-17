@@ -64,4 +64,79 @@ class Release: SVTBase
         return $controlResult;
     }
 
+    hidden [ControlResult] CheckInActiveRelease([ControlResult] $controlResult)
+    {
+
+        $apiURL = $this.ResourceContext.ResourceId
+        $releaesObj = [WebRequestHelper]::InvokeGetWebRequest($apiURL);
+        if($releaesObj)
+        {
+            $pattern = "https://vsrm.dev.azure.com/$($this.SubscriptionContext.SubscriptionName)/(.*?)/_apis/Release/definitions/$($releaesObj.id)" 
+            $projectId = [regex]::match($releaesObj.url.ToLower(), $pattern.ToLower()).Groups[1].Value
+            $apiURL = "https://{0}.visualstudio.com/_apis/Contribution/HierarchyQuery/project/{1}?api-version=5.0-preview.1" -f $($this.SubscriptionContext.SubscriptionName),$projectId;
+            $inputbody =  "{
+                'contributionIds': [
+                    'ms.vss-releaseManagement-web.releases-list-data-provider'
+                ],
+                'dataProviderContext': {
+                    'properties': {
+                        'definitionIds': '$($releaesObj.id)',
+                        'definitionId': '$($releaesObj.id)',
+                        'fetchAllReleases': true,
+                        'sourcePage': {
+                            'url': 'https://$($this.SubscriptionContext.SubscriptionName).visualstudio.com/AzSDKDemoRepo/_release?view=mine&definitionId=$($releaesObj.id)',
+                            'routeId': 'ms.vss-releaseManagement-web.hub-explorer-3-default-route',
+                            'routeValues': {
+                                'project': '$($this.ResourceContext.ResourceGroupName)',
+                                'viewname': 'hub-explorer-3-view',
+                                'controller': 'ContributedPage',
+                                'action': 'Execute'
+                            }
+                        }
+                    }
+                }
+            }"  | ConvertFrom-Json 
+
+        $responseObj = [WebRequestHelper]::InvokePostWebRequest($apiURL,$inputbody);
+
+        if([Helpers]::CheckMember($responseObj,"dataProviders") -and $responseObj.dataProviders.'ms.vss-releaseManagement-web.releases-list-data-provider')
+        {
+
+            $releases = $responseObj.dataProviders.'ms.vss-releaseManagement-web.releases-list-data-provider'.releases
+
+            if(($releases | Measure-Object).Count -gt 0 )
+            {
+                $recentReleases = @()
+                 $releases | ForEach-Object { 
+                    if([datetime]::Parse( $_.createdOn) -gt (Get-Date).AddDays(-$($this.ControlSettings.Release.ReleaseHistoryPeriodInDays)))
+                    {
+                        $recentReleases+=$_
+                    }
+                }
+                
+                if(($recentReleases | Measure-Object).Count -gt 0 )
+                {
+                    $controlResult.AddMessage([VerificationResult]::Passed,
+                    "Found recent releases triggered within $($this.ControlSettings.Release.ReleaseHistoryPeriodInDays) days");
+                }
+                else
+                {
+                    $controlResult.AddMessage([VerificationResult]::Failed,
+                    "No recent release history found in last $($this.ControlSettings.Release.ReleaseHistoryPeriodInDays) days");
+                }
+            }
+            else
+            {
+                $controlResult.AddMessage([VerificationResult]::Failed,
+                "No release history found.");
+            }
+           
+        }
+        else {
+            $controlResult.AddMessage([VerificationResult]::Failed,
+                                                "No release history found. release is inactive.");
+        }
+    } 
+        return $controlResult
+    }
 }

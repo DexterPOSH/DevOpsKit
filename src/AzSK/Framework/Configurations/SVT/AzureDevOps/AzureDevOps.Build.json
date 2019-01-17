@@ -77,8 +77,8 @@
         "Description": " Inactive build must be removed",
         "Id": "Build160",
         "ControlSeverity": "Low",
-        "Automated": "No",
-        "MethodName": "",
+        "Automated": "Yes",
+        "MethodName": "CheckInActiveBuild",
         "Rationale": "Each additional build having access at repositories increases the attack surface. To minimize this risk ensure that only activite and legitimate build resources present in Organization",
         "Recommendation": "https://docs.microsoft.com/en-us/rest/api/azure/devops/build/definitions/delete?view=azure-devops-rest-5.0",
         "Tags": [

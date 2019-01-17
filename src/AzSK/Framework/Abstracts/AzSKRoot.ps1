@@ -19,7 +19,7 @@ class AzSKRoot: EventBase
 		}
 		else
 		{
-			throw [SuppressedException] ("OrganizationName [$subscriptionId] is malformed. Subscription Id should contain 32 digits with 4 dashes (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).")
+			throw [SuppressedException] ("OrganizationName name [$subscriptionId] is either malformed or incorrect.")
 		}
 	}
 	

@@ -164,4 +164,45 @@ class Organization: SVTBase
         }
         return $controlResult
     }
+
+    hidden [ControlResult] CheckInActiveUsers([ControlResult] $controlResult)
+    {
+
+        $apiURL = "https://{0}.vsaex.visualstudio.com/_apis/UserEntitlements?top=50&filter=&sortOption=lastAccessDate+ascending" -f $($this.SubscriptionContext.SubscriptionName);
+        $responseObj = [WebRequestHelper]::InvokeGetWebRequest($apiURL);
+
+        if($responseObj.Count -gt 0)
+        {
+            $inactiveUsers =  @()
+            $responseObj[0].items | ForEach-Object { 
+                if([datetime]::Parse($_.lastAccessedDate) -lt ((Get-Date).AddDays(-$($this.ControlSettings.Organization.InActiveUserActivityLogsPeriodInDays))))
+                {
+                    $inactiveUsers+= $_
+                }                
+            }
+            if(($inactiveUsers | Measure-Object).Count -gt 0)
+            {
+                if($inactiveUsers.Count -eq 50)
+                {
+                    $controlResult.AddMessage("Displaying top 50 inactive users")
+                }
+                $inactiveUsersNames = ($inactiveUsers | Select-Object -Property @{Name="Name"; Expression = {$_.User.displayName}},@{Name="mailAddress"; Expression = {$_.User.mailAddress}})
+                $controlResult.AddMessage([VerificationResult]::Failed,
+                                        "Review inactive users present on Organization",$inactiveUsersNames);
+            }
+            else {
+                $controlResult.AddMessage([VerificationResult]::Passed,
+                                        "No inactive users found")   
+            }
+        }
+        else
+        {
+            $controlResult.AddMessage([VerificationResult]::Passed,
+                                        "No inactive users found");
+        }
+        
+        return $controlResult;
+    }
+
+
 }

@@ -329,5 +329,14 @@
     "High": "High",
     "Medium": "Medium",
     "Low": "Low"
+  },
+  "Build":{
+    "BuildHistoryPeriodInDays": 180
+  },
+  "Release":{
+    "ReleaseHistoryPeriodInDays": 180
+  },
+  "Organization":{
+    "InActiveUserActivityLogsPeriodInDays": 365
   }
 }
