@@ -72,7 +72,7 @@ class SQLDatabase: SVTBase
 
     hidden [ControlResult] CheckSqlServerVersionUpgrade([ControlResult] $controlResult)
     {
-        $upgradeStatus = Get-AzureRmSqlServerUpgrade -ResourceGroupName  $this.ResourceContext.ResourceGroupName -ServerName $this.ResourceContext.ResourceName -ErrorAction Stop
+       <# $upgradeStatus = Get-AzureRmSqlServerUpgrade -ResourceGroupName  $this.ResourceContext.ResourceGroupName -ServerName $this.ResourceContext.ResourceName -ErrorAction Stop
 
         $controlResult.AddMessage([MessageData]::new("Current status of SQL Database server upgrade -",
 			                                         $upgradeStatus));
@@ -84,7 +84,7 @@ class SQLDatabase: SVTBase
         else
         {
             $controlResult.VerificationResult = [VerificationResult]::Failed
-        }
+        }#>
 
         return $controlResult;
     }
