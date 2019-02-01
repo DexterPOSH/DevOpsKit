@@ -49,7 +49,7 @@
 
     # Modules that must be imported into the global environment prior to importing this module
     RequiredModules        = @(
-        @{ModuleName = 'Az.Accounts'; RequiredVersion = '1.1.0'}
+        @{ModuleName = 'Az.Accounts'; RequiredVersion = '1.2.1'}
 		@{ModuleName = 'Az.Storage'; RequiredVersion = '1.0.1'}
         @{ModuleName = 'Az.AnalysisServices'; RequiredVersion = '1.0.0'}
         @{ModuleName = 'Az.ApiManagement'; RequiredVersion = '1.0.0'}
